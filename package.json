@@ -1,0 +1,25 @@
+{
+  "name": "ts-logger",
+  "version": "1.0.0",
+  "description": "Class Logging Decoration",
+  "main": "src/main.ts",
+  "scripts": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bakerstreet-industries/ts-logger.git"
+  },
+  "keywords": [
+    "Typescript",
+    "Logging",
+    "ES7",
+    "Decorators"
+  ],
+  "author": "Russ Watson",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/bakerstreet-industries/ts-logger/issues"
+  },
+  "homepage": "https://github.com/bakerstreet-industries/ts-logger#readme"
+}
