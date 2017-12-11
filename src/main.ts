@@ -9,12 +9,12 @@ export default function log(opts: ILogOptions = null): ((target) => void) {
   if (!opts.out) {
     opts.out = console.log;
   }
-  return function (target: any): void {
+  return function (target): void {
     let pt = target.prototype;
     Object.keys(pt).forEach(key => {
       let fn: IPatchedMethod = applyisMethod(pt[key]);
       if (!fn.isPatched && fn.isAMethod) {
-        pt[key] = applyMonkeyPatch(fn, key, opts);
+        pt[key] = applyMonkeyPatch(pt, fn, key, opts);
       }
     });
   };
@@ -45,38 +45,53 @@ function applyisMethod(allegedFn: IPatchedMethod): IPatchedMethod {
   return allegedFn;
 }
 
-function applyMonkeyPatch(method: IPatchedMethod, methodName: string, opts: ILogOptions): Function {
+function applyMonkeyPatch(prototype, method: IPatchedMethod, methodName: string, opts: ILogOptions): Function {
   method.isPatched = true;
-  console.log('What is this?1', this);
-  return (...rest): any => {
-    let result = method.apply(this, rest);
-    console.log('What is this?2', this);
-    waitForResult(result).then(val => {
-      console.log('What is this?3', this);
+
+  return function (...rest): any {
+    const doLog = (val) => {
       opts.out(
         opts.hook({
-          arguments: [],
-          className: this.constructor ? this.constructor.name : '[UNKNOWN_CLASS_NAME]',
-          properties: [],
+          arguments: buildParameterKeyValList(rest, method),
+          className: prototype.constructor ? prototype.constructor.name : '[UNKNOWN_CLASS_NAME]',
+          properties: Object.keys(this).map(key => {
+            return `[${key}=${JSON.stringify(this[key])}]`;
+          }),
           result: val,
           timestamp: Date.now(),
         })
       );
-    });
+      //console.log(opts.out === console.log, 'What?!@', opts.out, console.log);
+    }
+    let result = method.apply(prototype, rest);
+    if (result instanceof Promise) {
+      return result.then(val => {
+        doLog(val);
+        return val;
+      })
+    }
+
+    doLog(result);
     return result;
   }
 }
 
 function defaultHook(props: IHookProperties): string {
-  return "loooooooooooooool";
+  return JSON.stringify(props);
 }
 
-function waitForResult(result): Promise<any> {
-  return new Promise(resolve => {
-    if (result instanceof Promise) {
-      result.then(val => resolve(val));
-    } else {
-      resolve(result);
-    }
+function buildParameterKeyValList(parameterValues: any[], method: Function): string[] {
+  const fnStr = method.toString().replace(/((\/\/.*$)|(\/\*[\s\S]*?\*\/))/mg, '');
+  let parameterNames: string[] | null = fnStr.slice(
+    fnStr.indexOf('(') + 1,
+    fnStr.indexOf(')')
+  ).match(/([^\s,]+)/g);
+  if (parameterNames === null)
+    return [];
+
+  return parameterNames.map((value: string, argNameIndex: number): string => {
+    if (argNameIndex === -1 || argNameIndex >= parameterValues.length) return '';
+
+    return `[${parameterNames[argNameIndex]}=${JSON.stringify(parameterValues[argNameIndex])}]`
   });
-}
+};
