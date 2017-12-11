@@ -26,14 +26,15 @@ class MockClass {
 describe("ts-logger", () => {
   it("Should log output to console.log", done => {
 
-    //Unfortunately, the wrapping of conosle.log by the spy never gets triggered by the default `out`
-    //In order to test and have positive results, we have to have a function that wraps console.log and spy on the wrapper
+    //Wrapping conosle.log in a spy prevents the default `out`, which is assigned to console.log, from being called
+    //since the spy itself has wrapped console.log
+    //Proof - console.log(opts.out === console.log) //false when chai.spy.on(console, 'log') and the default out is used.
+    //In order spy on console.log, we have to have a function that wraps console.log in order to spy on it.
     let spy = chai.spy.on(console, 'log');
     let mc = new MockClass();
     mc.prop1 = "ok";
     mc.doStuff("abc");
 
-    console.warn('Testing expectation');
     chai.expect(spy).to.have.been.called();
 
     new MockClass().doAsyncStuff()
