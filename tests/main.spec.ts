@@ -1,5 +1,6 @@
+import { IHookProperties } from './../src/main';
 import chai = require("chai");
-import spies = require("chai-spies")
+import spies = require("chai-spies-next")
 import log from "../src/main";
 
 chai.use(spies);
@@ -8,7 +9,18 @@ function wrappedConsoleLog(message: string, ...rest): void {
   console.log.apply(this, [message].concat(rest));
 }
 
-@log({out: wrappedConsoleLog})
+function wrappedConsoleErr(message: string, ...rest): void {
+  console.error.apply(this, [message].concat(rest));
+}
+
+let samplePropReturn = null;
+function samplePropertyHook(props: IHookProperties): string {
+  props.timestamp = NaN;
+  samplePropReturn = `This is an example: ${JSON.stringify(props)}`;
+  return samplePropReturn;
+}
+
+@log({ out: wrappedConsoleLog, hook: samplePropertyHook })
 class MockClass {
   public prop1 = "sweet";
 
@@ -19,6 +31,13 @@ class MockClass {
     return Promise.resolve({
       sample: 'output'
     });
+  }
+}
+
+@log({out: wrappedConsoleErr })
+class MockLogErr {
+  public coolStuff(): void {
+    //Doesn't matter what happens.
   }
 }
 
@@ -40,5 +59,15 @@ describe("ts-logger", () => {
     new MockClass().doAsyncStuff()
       .then(val => chai.expect(spy).to.have.been.called.twice)
       .then(() => done());
+  });
+
+  it("Should have a property hook called that can return any string based on incoming log properties", () => {
+    chai.expect(samplePropReturn).to.equal('This is an example: {"arguments":[],"className":"MockClass","properties":["[prop1=\\"sweet\\"]"],"result":{"sample":"output"},"timestamp":null}');
+  });
+
+  it("Should log output to console.error", () => {
+    let spy = chai.spy.on(console, 'error');
+    new MockLogErr().coolStuff();
+    chai.expect(spy).to.have.been.called.once;
   });
 });

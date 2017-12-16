@@ -28,7 +28,7 @@
     "@types/chai-spies": "0.0.0",
     "@types/mocha": "^2.2.44",
     "chai": "^4.1.2",
-    "chai-spies": "^0.7.1",
+    "chai-spies-next": "^0.9.3",
     "mocha": "^4.0.1",
     "nyc": "^11.3.0",
     "ts-loader": "^3.2.0",
