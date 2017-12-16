@@ -4,7 +4,7 @@
   "description": "Class Logging Decoration",
   "main": "src/main.ts",
   "scripts": {
-    "test": "mocha -r ts-node/register **/*.spec.ts",
+    "test": "nyc mocha **/*.spec.ts",
     "bundle": "webpack"
   },
   "repository": {
@@ -39,7 +39,7 @@
   },
   "nyc": {
     "include": [
-      "**/*.ts"
+      "src/*.ts"
     ],
     "extension": [
       ".ts"

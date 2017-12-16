@@ -1,4 +1,4 @@
-import { IHookProperties } from './../src/main';
+import { IHookProperties, ILogOptions } from './../src/main';
 import chai = require("chai");
 import spies = require("chai-spies-next")
 import log from "../src/main";
@@ -14,6 +14,7 @@ function wrappedConsoleErr(message: string, ...rest): void {
 }
 
 let samplePropReturn = null;
+
 function samplePropertyHook(props: IHookProperties): string {
   props.timestamp = NaN;
   samplePropReturn = `This is an example: ${JSON.stringify(props)}`;
@@ -34,10 +35,27 @@ class MockClass {
   }
 }
 
-@log({out: wrappedConsoleErr })
+@log({ out: wrappedConsoleErr })
 class MockLogErr {
   public coolStuff(): void {
     //Doesn't matter what happens.
+  }
+}
+
+let opts: ILogOptions = {};
+
+@log(opts)
+class MockLogDefaults {
+
+  public withDefaults(): any {
+
+  }
+}
+
+@log()
+class MockLogEmpty {
+  get fullNum(): number {
+    return 1;
   }
 }
 
@@ -69,5 +87,10 @@ describe("ts-logger", () => {
     let spy = chai.spy.on(console, 'error');
     new MockLogErr().coolStuff();
     chai.expect(spy).to.have.been.called.once;
+  });
+
+  it("Should have default out and hook values", () => {
+    chai.expect(opts.hook).to.not.be.null;
+    chai.expect(opts.out).to.not.be.null;
   });
 });

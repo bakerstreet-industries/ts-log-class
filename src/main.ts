@@ -13,7 +13,7 @@ export default function log(opts: ILogOptions = null): ((target) => void) {
     let pt = target.prototype;
     Object.keys(pt).forEach(key => {
       let fn: IPatchedMethod = applyisMethod(pt[key]);
-      if (!fn.isPatched && fn.isAMethod) {
+      if (fn && !fn.isPatched && fn.isAMethod) {
         pt[key] = applyMonkeyPatch(pt, fn, key, opts);
       }
     });
@@ -53,7 +53,7 @@ function applyMonkeyPatch(prototype, method: IPatchedMethod, methodName: string,
       opts.out(
         opts.hook({
           arguments: buildParameterKeyValList(rest, method),
-          className: prototype.constructor ? prototype.constructor.name : '[UNKNOWN_CLASS_NAME]',
+          className: prototype.constructor.name,
           properties: Object.keys(this).map(key => {
             return `[${key}=${JSON.stringify(this[key])}]`;
           }),
@@ -90,8 +90,6 @@ function buildParameterKeyValList(parameterValues: any[], method: Function): str
     return [];
 
   return parameterNames.map((value: string, argNameIndex: number): string => {
-    if (argNameIndex === -1 || argNameIndex >= parameterValues.length) return '';
-
     return `[${parameterNames[argNameIndex]}=${JSON.stringify(parameterValues[argNameIndex])}]`
   });
 };
