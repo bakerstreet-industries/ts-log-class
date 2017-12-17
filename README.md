@@ -42,7 +42,7 @@ new Car().drive(32);
 
 `console.log` output:
 ```
-{"className":"Car","methodName":"drive","timestamp":1513536484430,"arguments":{"mph": 32},"properties":{"numWheels": 4}}
+{"className":"Car","methodName":"drive","timestamp":1513536484430,"arguments":{"mph": 32},"properties":{"numWheels": 4},"result":"Driving 32mph!"}
 ```
 
 ## Options
