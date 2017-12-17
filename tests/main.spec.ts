@@ -1,6 +1,6 @@
 import { IHookProperties, ILogOptions } from './../src/main';
-import chai = require("chai");
-import spies = require("chai-spies-next")
+import * as chai from "chai";
+import * as spies from "chai-spies-next";
 import log from "../src/main";
 
 chai.use(spies);
