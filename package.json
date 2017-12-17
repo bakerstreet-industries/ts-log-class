@@ -1,6 +1,6 @@
 {
   "name": "logger-decorator",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Class Logging Decoration",
   "main": ".webpack/main.js",
   "scripts": {
@@ -56,5 +56,6 @@
     "sourceMap": true,
     "instrument": true
   },
-  "dependencies": {}
+  "dependencies": {},
+  "typings": ".webpack/src/main.d.ts"
 }
