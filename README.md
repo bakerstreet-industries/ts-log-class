@@ -16,7 +16,7 @@
 ## Usage
 
 ```
-import log from "logger-decorator";
+import log from "ts-log-class";
 
 @log()
 export class Car {
