@@ -6,7 +6,7 @@
 [![npm version](https://badge.fury.io/js/ts-log-class.svg)](https://badge.fury.io/js/ts-log-class)
 
 
-`ts-log-class` is a helper utility that will add log output for all methods of a class by adding a `@log` decorator to the class definition. Stop adding console.log or other logging strategies within each method, but have it done for you. I wrote this utility specifically so that I could continue writing tests for the [aws-ts-starter](https://github.com/bakerstreet-industries/aws-ts-starter).
+`ts-log-class` is a helper utility that will add log output for all methods of a class by adding a `@log` decorator to the class definition. Stop adding console.log or other logging strategies within each method, but have it done for you. This utility was written specifically for test compaitibility as part of the [aws-ts-starter](https://github.com/bakerstreet-industries/aws-ts-starter).
 
 
 ## Install
