@@ -1,8 +1,8 @@
 {
   "name": "logger-decorator",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Class Logging Decoration",
-  "main": "src/main.ts",
+  "main": ".webpack/main.js",
   "scripts": {
     "test": "nyc mocha **/*.spec.ts",
     "bundle": "webpack"
