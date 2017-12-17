@@ -28,7 +28,8 @@ export interface ILogOptions {
 export interface IHookProperties {
   timestamp: number;
   className: string;
-  arguments: string[];
+  methodName: string;
+  arguments: { [parameterName: string]: any };
   properties: { [property: string]: any };
   result: any;
 }
@@ -52,13 +53,12 @@ function applyMonkeyPatch(prototype, method: IPatchedMethod, methodName: string,
     const doLog = (val) => {
       opts.out(
         opts.hook({
-          arguments: buildParameterKeyValList(rest, method),
           className: prototype.constructor.name,
-          properties: Object.keys(this).map(key => {
-            return `[${key}=${JSON.stringify(this[key])}]`;
-          }),
-          result: val,
+          methodName: methodName,
           timestamp: Date.now(),
+          arguments: buildParameterHash(rest, method),
+          properties: buildPropertyHash(this),
+          result: val,
         })
       );
       //console.log(opts.out === console.log, 'What?!@', opts.out, console.log);
@@ -80,16 +80,28 @@ function defaultHook(props: IHookProperties): string {
   return JSON.stringify(props);
 }
 
-function buildParameterKeyValList(parameterValues: any[], method: Function): string[] {
+function buildParameterHash(parameterValues: any[], method: Function): { [parameterName: string]: any } {
   const fnStr = method.toString().replace(/((\/\/.*$)|(\/\*[\s\S]*?\*\/))/mg, '');
   let parameterNames: string[] | null = fnStr.slice(
     fnStr.indexOf('(') + 1,
     fnStr.indexOf(')')
   ).match(/([^\s,]+)/g);
-  if (parameterNames === null)
-    return [];
 
-  return parameterNames.map((value: string, argNameIndex: number): string => {
-    return `[${parameterNames[argNameIndex]}=${JSON.stringify(parameterValues[argNameIndex])}]`
+  let hash = {};
+  if (parameterNames === null)
+    return hash;
+
+  parameterNames.forEach((value: string, idx: number) => {
+    hash[value] = JSON.stringify(parameterValues[idx])
   });
+
+  return hash;
 };
+
+function buildPropertyHash(instance: any): { [property: string]: any } {
+  let hash = {};
+  Object.keys(instance).forEach(key => {
+    hash[key] = JSON.stringify(instance[key]);
+  })
+  return hash;
+}

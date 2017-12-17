@@ -23,12 +23,12 @@ function samplePropertyHook(props: IHookProperties): string {
 
 @log({ out: wrappedConsoleLog, hook: samplePropertyHook })
 class MockClass {
-  public prop1 = "sweet";
+  prop1 = "sweet";
 
-  public doStuff(sampleParam: string): string {
+  doStuff(sampleParam: string): string {
     return "Mock did stuff!";
   }
-  public doAsyncStuff(): Promise<{ sample: string }> {
+  doAsyncStuff(): Promise<{ sample: string }> {
     return Promise.resolve({
       sample: 'output'
     });
@@ -37,8 +37,8 @@ class MockClass {
 
 @log({ out: wrappedConsoleErr })
 class MockLogErr {
-  public coolStuff(): void {
-    //Doesn't matter what happens.
+  coolStuff(): void {
+
   }
 }
 
@@ -47,7 +47,7 @@ let opts: ILogOptions = {};
 @log(opts)
 class MockLogDefaults {
 
-  public withDefaults(): any {
+  withDefaults(): any {
 
   }
 }
@@ -80,7 +80,7 @@ describe("ts-log-class", () => {
   });
 
   it("Should have a property hook called that can return any string based on incoming log properties", () => {
-    chai.expect(samplePropReturn).to.equal('This is an example: {"arguments":[],"className":"MockClass","properties":["[prop1=\\"sweet\\"]"],"result":{"sample":"output"},"timestamp":null}');
+    chai.expect(samplePropReturn).to.equal('This is an example: {"className":"MockClass","methodName":"doAsyncStuff","timestamp":null,"arguments":{},"properties":{"prop1":"\\"sweet\\""},"result":{"sample":"output"}}');
   });
 
   it("Should log output to console.error", () => {
