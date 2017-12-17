@@ -60,7 +60,7 @@ class MockLogEmpty {
 }
 
 
-describe("ts-logger", () => {
+describe("ts-log-class", () => {
   it("Should log output to console.log", done => {
 
     //Wrapping conosle.log in a spy prevents the default `out`, which is assigned to console.log, from being called

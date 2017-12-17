@@ -1,7 +1,7 @@
 {
-  "name": "logger-decorator",
-  "version": "1.0.3",
-  "description": "Class Logging Decoration",
+  "name": "ts-log-class",
+  "version": "1.0.0",
+  "description": "Class Logging via Decorator with out and message format hooks",
   "main": ".webpack/main.js",
   "scripts": {
     "test": "nyc mocha **/*.spec.ts",
@@ -9,7 +9,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/bakerstreet-industries/ts-logger.git"
+    "url": "git+https://github.com/bakerstreet-industries/ts-log-class.git"
   },
   "keywords": [
     "Typescript",
@@ -20,9 +20,9 @@
   "author": "Russ Watson",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/bakerstreet-industries/ts-logger/issues"
+    "url": "https://github.com/bakerstreet-industries/ts-log-class/issues"
   },
-  "homepage": "https://github.com/bakerstreet-industries/ts-logger#readme",
+  "homepage": "https://github.com/bakerstreet-industries/ts-log-class#readme",
   "devDependencies": {
     "@types/chai": "^4.0.6",
     "@types/chai-spies": "0.0.0",
