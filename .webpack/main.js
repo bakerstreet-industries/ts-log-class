@@ -70,16 +70,49 @@
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
+var DEFAULT_OPTS = {
+    hook: defaultHook,
+    out: console.log
+};
+/**
+ * Default options that are used for the log function when specific options are not passed.
+ *
+ * @export
+ * @param {ILogOptions} options
+ */
+function setDefault(options) {
+    if (options.hook) {
+        DEFAULT_OPTS.hook = options.hook;
+    }
+    if (options.out) {
+        DEFAULT_OPTS.out = options.out;
+    }
+}
+exports.setDefault = setDefault;
+/**
+ * Builds a set of properties, `IHookProperties`, that are passed into an `out` function. By default the properties
+ * are formed into a message using JSON.stringify and `out` to `console.log`.
+ *
+ * You may override the default `hook` method to format the message output however you like and overide
+ * the `out` method with any function matching this interface: `(message?: any, ...optionalParams: any[]) => void`.
+ *
+ * If you would like to override the `hook` and, or `out` functions for every usage of the `log` function, use
+ * `setDefault`.
+ *
+ * @export
+ * @param {ILogOptions} [opts=null]
+ * @returns {((target) => void)}
+ */
 function log(opts) {
     if (opts === void 0) { opts = null; }
     if (!opts) {
         opts = {};
     }
     if (!opts.hook) {
-        opts.hook = defaultHook;
+        opts.hook = DEFAULT_OPTS.hook;
     }
     if (!opts.out) {
-        opts.out = console.log;
+        opts.out = DEFAULT_OPTS.out;
     }
     return function (target) {
         var pt = target.prototype;
@@ -108,13 +141,12 @@ function applyMonkeyPatch(prototype, method, methodName, opts) {
         }
         var doLog = function (val) {
             opts.out(opts.hook({
-                arguments: buildParameterKeyValList(rest, method),
                 className: prototype.constructor.name,
-                properties: Object.keys(_this).map(function (key) {
-                    return "[" + key + "=" + JSON.stringify(_this[key]) + "]";
-                }),
-                result: val,
+                methodName: methodName,
                 timestamp: Date.now(),
+                arguments: buildParameterHash(rest, method),
+                properties: buildPropertyHash(_this),
+                result: val,
             }));
             //console.log(opts.out === console.log, 'What?!@', opts.out, console.log);
         };
@@ -123,6 +155,9 @@ function applyMonkeyPatch(prototype, method, methodName, opts) {
             return result.then(function (val) {
                 doLog(val);
                 return val;
+            }).catch(function (reason) {
+                doLog(reason);
+                return reason;
             });
         }
         doLog(result);
@@ -132,16 +167,25 @@ function applyMonkeyPatch(prototype, method, methodName, opts) {
 function defaultHook(props) {
     return JSON.stringify(props);
 }
-function buildParameterKeyValList(parameterValues, method) {
+function buildParameterHash(parameterValues, method) {
     var fnStr = method.toString().replace(/((\/\/.*$)|(\/\*[\s\S]*?\*\/))/mg, '');
     var parameterNames = fnStr.slice(fnStr.indexOf('(') + 1, fnStr.indexOf(')')).match(/([^\s,]+)/g);
+    var hash = {};
     if (parameterNames === null)
-        return [];
-    return parameterNames.map(function (value, argNameIndex) {
-        return "[" + parameterNames[argNameIndex] + "=" + JSON.stringify(parameterValues[argNameIndex]) + "]";
+        return hash;
+    parameterNames.forEach(function (value, idx) {
+        hash[value] = JSON.stringify(parameterValues[idx]);
     });
+    return hash;
 }
 ;
+function buildPropertyHash(instance) {
+    var hash = {};
+    Object.keys(instance).forEach(function (key) {
+        hash[key] = JSON.stringify(instance[key]);
+    });
+    return hash;
+}
 
 
 /***/ })

@@ -1,12 +1,13 @@
 {
   "name": "ts-log-class",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "description": "Class Logging via Decorator with out and message format hooks",
   "main": ".webpack/main.js",
   "scripts": {
     "test": "nyc mocha **/*.spec.ts",
     "bundle": "webpack",
     "publish-please": "publish-please",
+    "doPublish": "npm test && npm run bundle",
     "prepublish": "publish-please guard"
   },
   "repository": {
