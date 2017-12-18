@@ -68,7 +68,10 @@ function applyMonkeyPatch(prototype, method: IPatchedMethod, methodName: string,
       return result.then(val => {
         doLog(val);
         return val;
-      })
+      }).catch(reason => {
+        doLog(reason);
+        return reason;
+      });
     }
 
     doLog(result);

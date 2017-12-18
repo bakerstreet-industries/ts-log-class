@@ -33,6 +33,10 @@ class MockClass {
       sample: 'output'
     });
   }
+
+  doFailAsyncStuff(): Promise<string> {
+    return Promise.reject("#FAIL");
+  }
 }
 
 @log({ out: wrappedConsoleErr })
@@ -74,8 +78,13 @@ describe("ts-log-class", () => {
 
     chai.expect(spy).to.have.been.called();
 
-    new MockClass().doAsyncStuff()
-      .then(val => chai.expect(spy).to.have.been.called.twice)
+    new MockClass().doFailAsyncStuff()
+      .catch(reason => {
+        chai.expect(spy).to.have.been.called.twice;
+        return reason;
+      })
+      .then(() => new MockClass().doAsyncStuff())
+      .then(val => chai.expect(spy).to.have.been.called.exactly(3))
       .then(() => done());
   });
 
