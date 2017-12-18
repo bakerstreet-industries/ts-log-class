@@ -1,13 +1,46 @@
+const DEFAULT_OPTS: ILogOptions = {
+  hook: defaultHook,
+  out: console.log
+};
 
+/**
+ * Default options that are used for the log function when specific options are not passed.
+ *
+ * @export
+ * @param {ILogOptions} options
+ */
+export function setDefault(options: ILogOptions): void {
+  if (options.hook) {
+    DEFAULT_OPTS.hook = options.hook;
+  }
+  if (options.out) {
+    DEFAULT_OPTS.out = options.out;
+  }
+}
+
+/**
+ * Builds a set of properties, `IHookProperties`, that are passed into an `out` function. By default the properties
+ * are formed into a message using JSON.stringify and `out` to `console.log`.
+ *
+ * You may override the default `hook` method to format the message output however you like and overide
+ * the `out` method with any function matching this interface: `(message?: any, ...optionalParams: any[]) => void`.
+ *
+ * If you would like to override the `hook` and, or `out` functions for every usage of the `log` function, use
+ * `setDefault`.
+ *
+ * @export
+ * @param {ILogOptions} [opts=null]
+ * @returns {((target) => void)}
+ */
 export default function log(opts: ILogOptions = null): ((target) => void) {
   if (!opts) {
     opts = {};
   }
   if (!opts.hook) {
-    opts.hook = defaultHook;
+    opts.hook = DEFAULT_OPTS.hook;
   }
   if (!opts.out) {
-    opts.out = console.log;
+    opts.out = DEFAULT_OPTS.out;
   }
   return function (target): void {
     let pt = target.prototype;
@@ -20,11 +53,23 @@ export default function log(opts: ILogOptions = null): ((target) => void) {
   };
 }
 
+/**
+ * An options interface to override the default logging message buildder and output methods.
+ *
+ * @export
+ * @interface ILogOptions
+ */
 export interface ILogOptions {
   hook?: (logProps: IHookProperties) => string;
   out?: (message?: any, ...optionalParams: any[]) => void;
 }
 
+/**
+ * The properties that the `hook` method receives to build a message.
+ *
+ * @export
+ * @interface IHookProperties
+ */
 export interface IHookProperties {
   timestamp: number;
   className: string;

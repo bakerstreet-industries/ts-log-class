@@ -1,7 +1,7 @@
 import { IHookProperties, ILogOptions } from './../src/main';
 import * as chai from "chai";
 import * as spies from "chai-spies-next";
-import log from "../src/main";
+import log, { setDefault } from "../src/main";
 
 chai.use(spies);
 
@@ -45,6 +45,20 @@ class MockLogErr {
 
   }
 }
+
+function newDefHook(props: IHookProperties): string {
+  return "Hooked.";
+}
+
+function newDefOut(message: string, ...rest): void {
+
+}
+
+setDefault({hook: newDefHook, out: newDefOut});
+// For code coverage
+setDefault({hook: newDefHook});
+// For code coverage
+setDefault({out: newDefOut});
 
 let opts: ILogOptions = {};
 
@@ -99,7 +113,7 @@ describe("ts-log-class", () => {
   });
 
   it("Should have default out and hook values", () => {
-    chai.expect(opts.hook).to.not.be.null;
-    chai.expect(opts.out).to.not.be.null;
+    chai.expect(opts.hook).to.equal(newDefHook);
+    chai.expect(opts.out).to.equal(newDefOut);
   });
 });
