@@ -1,6 +1,6 @@
 # ts-log-class
 
-[![Build Status](https://travis-ci.org/bakerstreet-industries/ts-log-class.svg?branch=master)](https://travis-ci.org/bakerstreet-industries/ts-log-class.svg?branch=master)
+[![Build Status](https://travis-ci.org/bakerstreet-industries/ts-log-class.svg?branch=master)](https://travis-ci.org/bakerstreet-industries/ts-log-class)
 [![Coverage Status](https://coveralls.io/repos/github/bakerstreet-industries/ts-log-class/badge.svg?branch=master)](https://coveralls.io/github/bakerstreet-industries/ts-log-class?branch=master)
 [![License: MIT](https://img.shields.io/badge/License-MIT-brightgreen.svg)](https://opensource.org/licenses/MIT)
 [![npm version](https://badge.fury.io/js/ts-log-class.svg)](https://badge.fury.io/js/ts-log-class)
