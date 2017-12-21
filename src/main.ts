@@ -109,7 +109,7 @@ function applyMonkeyPatch(target, prototype, method: IPatchedMethod, methodName:
           })
         );
       }
-      let result = method.apply(prototype, rest);
+      let result = method.apply(instance, rest);
       if (result instanceof Promise) {
         return result.then(val => {
           doLog(val);
@@ -122,7 +122,7 @@ function applyMonkeyPatch(target, prototype, method: IPatchedMethod, methodName:
 
       doLog(result);
       return result;
-    }.bind(target);
+    }
     return wrapper.apply(this, rest);
   }
 }
