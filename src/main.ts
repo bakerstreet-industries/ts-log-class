@@ -116,7 +116,7 @@ function applyMonkeyPatch(target, prototype, method: IPatchedMethod, methodName:
           return val;
         }).catch(reason => {
           doLog(reason);
-          return reason;
+          return Promise.reject(reason);
         });
       }
 
