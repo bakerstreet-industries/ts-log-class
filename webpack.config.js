@@ -13,8 +13,9 @@ module.exports = {
   },
   output: {
     libraryTarget: 'umd',
+    library: 'ts-log-class',
     path: path.join(__dirname, '.webpack'),
-    filename: '[name].js',
+    filename: 'tslogclass.js',
   },
   target: 'node',
   module: {
