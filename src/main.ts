@@ -95,32 +95,35 @@ function applyMonkeyPatch(prototype, method: IPatchedMethod, methodName: string,
   method.isPatched = true;
 
   return function (...rest): any {
-    const doLog = (val) => {
-      opts.out(
-        opts.hook({
-          className: prototype.constructor.name,
-          methodName: methodName,
-          timestamp: Date.now(),
-          arguments: buildParameterHash(rest, method),
-          properties: buildPropertyHash(this),
-          result: val,
-        })
-      );
-      //console.log(opts.out === console.log, 'What?!@', opts.out, console.log);
-    }
-    let result = method.apply(prototype, rest);
-    if (result instanceof Promise) {
-      return result.then(val => {
-        doLog(val);
-        return val;
-      }).catch(reason => {
-        doLog(reason);
-        return reason;
-      });
-    }
+    let instance = this;
+    let wrapper = function (...rest): any {
+      const doLog = (val) => {
+        opts.out(
+          opts.hook({
+            className: prototype.constructor.name,
+            methodName: methodName,
+            timestamp: Date.now(),
+            arguments: buildParameterHash(rest, method),
+            properties: buildPropertyHash(instance),
+            result: val,
+          })
+        );
+      }
+      let result = method.apply(prototype, rest);
+      if (result instanceof Promise) {
+        return result.then(val => {
+          doLog(val);
+          return val;
+        }).catch(reason => {
+          doLog(reason);
+          return reason;
+        });
+      }
 
-    doLog(result);
-    return result;
+      doLog(result);
+      return result;
+    }.bind(prototype);
+    return wrapper.apply(this, rest);
   }
 }
 
