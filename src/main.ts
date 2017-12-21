@@ -47,7 +47,7 @@ export default function log(opts: ILogOptions = null): ((target) => void) {
     Object.keys(pt).forEach(key => {
       let fn: IPatchedMethod = applyisMethod(pt[key]);
       if (fn && !fn.isPatched && fn.isAMethod) {
-        pt[key] = applyMonkeyPatch(pt, fn, key, opts);
+        pt[key] = applyMonkeyPatch(target, pt, fn, key, opts);
       }
     });
   };
@@ -91,7 +91,7 @@ function applyisMethod(allegedFn: IPatchedMethod): IPatchedMethod {
   return allegedFn;
 }
 
-function applyMonkeyPatch(prototype, method: IPatchedMethod, methodName: string, opts: ILogOptions): Function {
+function applyMonkeyPatch(target, prototype, method: IPatchedMethod, methodName: string, opts: ILogOptions): Function {
   method.isPatched = true;
 
   return function (...rest): any {
@@ -122,7 +122,7 @@ function applyMonkeyPatch(prototype, method: IPatchedMethod, methodName: string,
 
       doLog(result);
       return result;
-    }.bind(prototype);
+    }.bind(target);
     return wrapper.apply(this, rest);
   }
 }
