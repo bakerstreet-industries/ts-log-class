@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "module": "umd",
+    "module": "commonjs",
     "moduleResolution": "node",
     "target": "es5",
     "experimentalDecorators": true,
