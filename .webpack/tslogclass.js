@@ -4,9 +4,9 @@
 	else if(typeof define === 'function' && define.amd)
 		define([], factory);
 	else if(typeof exports === 'object')
-		exports["tslogclass"] = factory();
+		exports["ts-log-class"] = factory();
 	else
-		root["tslogclass"] = factory();
+		root["ts-log-class"] = factory();
 })(typeof self !== 'undefined' ? self : this, function() {
 return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
