@@ -154,6 +154,7 @@ function buildParameterHash(parameterValues: any[], method: Function): { [parame
 
 function buildPropertyHash(instance: any): { [property: string]: any } {
   let hash = {};
+  if (!instance) return hash;
   Object.keys(instance).forEach(key => {
     hash[key] = JSON.stringify(instance[key]);
   })
