@@ -44,7 +44,8 @@ export default function log(opts: ILogOptions = null): ((target) => void) {
   }
   return function (target): void {
     let pt = target.prototype;
-    Object.keys(pt).forEach(key => {
+    let list: string[] = Object.keys(pt).concat(Object.getOwnPropertyNames(pt)).filter((key, idx, arr) => key !== "constructor" && arr.indexOf(key) === idx);
+    list.forEach(key => {
       let fn: IPatchedMethod = applyisMethod(pt[key]);
       if (fn && !fn.isPatched && fn.isAMethod) {
         pt[key] = applyMonkeyPatch(target, pt, fn, key, opts);
