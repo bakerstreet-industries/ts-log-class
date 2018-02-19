@@ -1,6 +1,6 @@
 {
   "name": "ts-log-class",
-  "version": "1.0.16",
+  "version": "1.0.17",
   "description": "Class Logging via Decorator with out and message format hooks",
   "main": ".webpack/tslogclass.js",
   "scripts": {
@@ -60,6 +60,8 @@
     "sourceMap": true,
     "instrument": true
   },
-  "dependencies": {},
+  "dependencies": {
+    "circular-json": "^0.5.1"
+  },
   "typings": ".webpack/src/main.d.ts"
 }

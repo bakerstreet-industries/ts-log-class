@@ -1,3 +1,5 @@
+import JSON = require("circular-json");
+
 const DEFAULT_OPTS: ILogOptions = {
   hook: defaultHook,
   out: console.log
