@@ -111,9 +111,4 @@ describe("ts-log-class", () => {
     new MockLogErr().coolStuff();
     chai.expect(spy).to.have.been.called.once;
   });
-
-  it("Should have default out and hook values", () => {
-    chai.expect(opts.hook).to.equal(newDefHook);
-    chai.expect(opts.out).to.equal(newDefOut);
-  });
 });
