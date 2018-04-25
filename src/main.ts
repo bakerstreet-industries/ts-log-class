@@ -35,14 +35,13 @@ export function setDefault(options: ILogOptions): void {
  * @returns {((target) => void)}
  */
 export default function log(opts: ILogOptions = null): ((target) => void) {
-  if (!opts) {
-    opts = {};
-  }
-  if (!opts.hook) {
-    opts.hook = DEFAULT_OPTS.hook;
-  }
-  if (!opts.out) {
-    opts.out = DEFAULT_OPTS.out;
+  const instanceOptions: ILogOptions = {};
+  if (opts) {
+    instanceOptions.hook = opts.hook || DEFAULT_OPTS.hook;
+    instanceOptions.out = opts.out || DEFAULT_OPTS.out;
+  } else {
+    instanceOptions.hook = DEFAULT_OPTS.hook;
+    instanceOptions.out = DEFAULT_OPTS.out;
   }
   return function (target): void {
     let pt = target.prototype;
@@ -50,7 +49,7 @@ export default function log(opts: ILogOptions = null): ((target) => void) {
     list.forEach(key => {
       let fn: IPatchedMethod = applyisMethod(pt[key]);
       if (fn && !fn.isPatched && fn.isAMethod) {
-        pt[key] = applyMonkeyPatch(target, pt, fn, key, opts);
+        pt[key] = applyMonkeyPatch(target, pt, fn, key, instanceOptions);
       }
     });
   };
@@ -142,8 +141,9 @@ function buildParameterHash(parameterValues: any[], method: Function): { [parame
   ).match(/([^\s,]+)/g);
 
   let hash = {};
-  if (parameterNames === null)
+  if (parameterNames === null) {
     return hash;
+  }
 
   parameterNames.forEach((value: string, idx: number) => {
     hash[value] = JSON.stringify(parameterValues[idx])
@@ -157,6 +157,6 @@ function buildPropertyHash(instance: any): { [property: string]: any } {
   if (!instance) return hash;
   Object.keys(instance).forEach(key => {
     hash[key] = JSON.stringify(instance[key]);
-  })
+  });
   return hash;
 }
