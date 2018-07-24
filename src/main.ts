@@ -1,7 +1,16 @@
-import JSON = require("circular-json");
+import JSON = require('circular-json');
 
-const DEFAULT_OPTS: ILogOptions = {
-  hook: defaultHook,
+import { samplePropertyHook } from './config';
+import { Logger } from './logger';
+
+let LOGGER;
+
+export function init(appName: string, environment: any) {
+  LOGGER = new Logger(appName, environment); 
+}
+
+export let DEFAULT_OPTS: ILogOptions = {
+  hook: samplePropertyHook,
   out: console.log
 };
 
@@ -36,16 +45,18 @@ export function setDefault(options: ILogOptions): void {
  */
 export default function log(opts: ILogOptions = null): ((target) => void) {
   const instanceOptions: ILogOptions = {};
-  if (opts) {
+  if(opts) {
     instanceOptions.hook = opts.hook || DEFAULT_OPTS.hook;
     instanceOptions.out = opts.out || DEFAULT_OPTS.out;
   } else {
     instanceOptions.hook = DEFAULT_OPTS.hook;
     instanceOptions.out = DEFAULT_OPTS.out;
   }
-  return function (target): void {
+
+  return (target): void => {
+    instanceOptions.out = (x) => LOGGER.log(x);
     let pt = target.prototype;
-    let list: string[] = Object.keys(pt).concat(Object.getOwnPropertyNames(pt)).filter((key, idx, arr) => key !== "constructor" && arr.indexOf(key) === idx);
+    let list: string[] = Object.keys(pt).concat(Object.getOwnPropertyNames(pt)).filter((key, idx, arr) => key !== 'constructor' && arr.indexOf(key) === idx);
     list.forEach(key => {
       let fn: IPatchedMethod = applyisMethod(pt[key]);
       if (fn && !fn.isPatched && fn.isAMethod) {
@@ -54,6 +65,20 @@ export default function log(opts: ILogOptions = null): ((target) => void) {
     });
   };
 }
+
+export const logger = logger_helper();
+
+function logger_helper() {
+  const logger_options = ['info', 'log', 'warn', 'error', 'debug'];
+  
+  let object;
+  
+  logger_options.forEach(element => {
+    object = {...object, [element]: (x) => {LOGGER[element](x)}}
+  });
+
+  return object;
+};
 
 /**
  * An options interface to override the default logging message buildder and output methods.
@@ -87,7 +112,7 @@ interface IPatchedMethod extends Function {
 }
 
 function applyisMethod(allegedFn: IPatchedMethod): IPatchedMethod {
-  if (typeof (allegedFn) === "function") {
+  if (typeof (allegedFn) === 'function') {
     allegedFn.isAMethod = true;
   }
   return allegedFn;
@@ -127,10 +152,6 @@ function applyMonkeyPatch(target, prototype, method: IPatchedMethod, methodName:
     }
     return wrapper.apply(this, rest);
   }
-}
-
-function defaultHook(props: IHookProperties): string {
-  return JSON.stringify(props);
 }
 
 function buildParameterHash(parameterValues: any[], method: Function): { [parameterName: string]: any } {
