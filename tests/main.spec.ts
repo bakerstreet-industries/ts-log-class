@@ -1,7 +1,7 @@
 import { IHookProperties, ILogOptions } from './../src/main';
 import * as chai from "chai";
 import * as spies from "chai-spies";
-import log, { IHasTsLogClassLogger } from "../src/main";
+import log from "../src/main";
 
 chai.use(spies);
 
@@ -47,14 +47,6 @@ class MockLogErr {
 
 @log({ out: wrappedConsoleLog, hook: samplePropertyHook, strategy: 'before-after' })
 class MockLogBeforeAfter {
-  coolStuff(): string {
-    return "TEST";
-  }
-}
-
-@log({ out: wrappedConsoleLog, hook: samplePropertyHook })
-class MockLogImplements implements IHasTsLogClassLogger {
-  tsLogClassLogger = console.warn
   coolStuff(): string {
     return "TEST";
   }
@@ -109,18 +101,6 @@ describe("ts-log-class", () => {
     chai.expect(messages.length).to.be.equal(2);
     chai.expect(messages[0]).to.equal('{"when":"before","className":"MockLogBeforeAfter","methodName":"coolStuff","timestamp":0,"arguments":{},"properties":{}}');
     chai.expect(messages[1]).to.equal('{"when":"after","className":"MockLogBeforeAfter","methodName":"coolStuff","timestamp":0,"arguments":{},"properties":{},"result":"TEST"}');
-  });
-
-  it("Should use implemented logger", () => {
-    const spyOut = sandbox.on(console, 'log');
-    const mc = new MockLogImplements();
-    const spyLogger = sandbox.on(mc, 'tsLogClassLogger')
-    mc.coolStuff();
-
-    chai.expect(spyOut).to.have.not.been.called();
-    chai.expect(spyLogger).to.have.been.called.once;
-    chai.expect(messages.length).to.be.equal(1);
-    chai.expect(messages[0]).to.equal('{"when":"after","className":"MockLogImplements","methodName":"coolStuff","timestamp":0,"arguments":{},"properties":{},"result":"TEST"}');
   });
 
   it("Should log output to console.error", () => {
