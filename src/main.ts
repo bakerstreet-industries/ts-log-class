@@ -1,62 +1,48 @@
 import JSON = require("circular-json");
 
-const DEFAULT_OPTS: ILogOptions = {
-  hook: defaultHook,
-  out: console.log
-};
-
-/**
- * Default options that are used for the log function when specific options are not passed.
- *
- * @export
- * @param {ILogOptions} options
- */
-export function setDefault(options: ILogOptions): void {
-  if (options.hook) {
-    DEFAULT_OPTS.hook = options.hook;
-  }
-  if (options.out) {
-    DEFAULT_OPTS.out = options.out;
-  }
+export interface IHasTsLogClassLogger {
+  tsLogClassLogger: (message?: any, ...optionalParams: any[]) => void;
 }
+
+export type ILogStrategies = "after" | "before-after"
 
 /**
  * Builds a set of properties, `IHookProperties`, that are passed into an `out` function. By default the properties
  * are formed into a message using JSON.stringify and `out` to `console.log`.
  *
- * You may override the default `hook` method to format the message output however you like and overide
+ * You may override the default `hook` method to format the message output however you like and override
  * the `out` method with any function matching this interface: `(message?: any, ...optionalParams: any[]) => void`.
- *
- * If you would like to override the `hook` and, or `out` functions for every usage of the `log` function, use
- * `setDefault`.
+ * 
+ * You can implement IHasTsLogClassLogger interface and tsLogClassLogger will be used for logging instead. It overrides `out` property.
+ * 
+ * You can also set a logging strategy. By default it logs after function execution. You can set strategy to 'before-after'
+ * to make it log before and after function execution.
  *
  * @export
- * @param {ILogOptions} [opts=null]
+ * @param {ILogOptions} [opts={}]
  * @returns {((target) => void)}
  */
-export default function log(opts: ILogOptions = null): ((target) => void) {
-  const instanceOptions: ILogOptions = {};
-  if (opts) {
-    instanceOptions.hook = opts.hook || DEFAULT_OPTS.hook;
-    instanceOptions.out = opts.out || DEFAULT_OPTS.out;
-  } else {
-    instanceOptions.hook = DEFAULT_OPTS.hook;
-    instanceOptions.out = DEFAULT_OPTS.out;
-  }
+export default function log(
+  {
+    hook = defaultHook,
+    out = console.log,
+    strategy = "after"
+  }: ILogOptions = {}
+): ((target) => void) {
   return function (target): void {
     let pt = target.prototype;
     let list: string[] = Object.keys(pt).concat(Object.getOwnPropertyNames(pt)).filter((key, idx, arr) => key !== "constructor" && arr.indexOf(key) === idx);
     list.forEach(key => {
       let fn: IPatchedMethod = applyisMethod(pt[key]);
       if (fn && !fn.isPatched && fn.isAMethod) {
-        pt[key] = applyMonkeyPatch(target, pt, fn, key, instanceOptions);
+        pt[key] = applyMonkeyPatch(target, pt, fn, key, { hook, out, strategy });
       }
     });
   };
 }
 
 /**
- * An options interface to override the default logging message buildder and output methods.
+ * An options interface to override the default logging message builder and output methods.
  *
  * @export
  * @interface ILogOptions
@@ -64,7 +50,10 @@ export default function log(opts: ILogOptions = null): ((target) => void) {
 export interface ILogOptions {
   hook?: (logProps: IHookProperties) => string;
   out?: (message?: any, ...optionalParams: any[]) => void;
+  strategy?: ILogStrategies
 }
+
+export type ILogTime = "before" | "after"
 
 /**
  * The properties that the `hook` method receives to build a message.
@@ -73,6 +62,7 @@ export interface ILogOptions {
  * @interface IHookProperties
  */
 export interface IHookProperties {
+  when: ILogTime;
   timestamp: number;
   className: string;
   methodName: string;
@@ -98,31 +88,39 @@ function applyMonkeyPatch(target, prototype, method: IPatchedMethod, methodName:
 
   return function (...rest): any {
     let instance = this;
-    let wrapper = function (...rest): any {
-      const doLog = (val) => {
-        opts.out(
-          opts.hook({
-            className: prototype.constructor.name,
-            methodName: methodName,
-            timestamp: Date.now(),
-            arguments: buildParameterHash(rest, method),
-            properties: buildPropertyHash(instance),
-            result: val,
-          })
-        );
-      }
-      let result = method.apply(instance, rest);
+    const out = this.tsLogClassLogger || opts.out;
+    const doLog = (params: any[], when: ILogTime, val?: any) => {
+      out(
+        opts.hook({
+          when,
+          className: instance.constructor.name,
+          methodName,
+          timestamp: Date.now(),
+          arguments: buildParameterHash(params, method),
+          properties: buildPropertyHash(instance),
+          result: val,
+        })
+      );
+    }
+    let doLogBefore: (message?: any, ...optionalParams: any[]) => void = () => undefined
+    if (opts.strategy === "before-after") {
+      doLogBefore = (params: any[]) => doLog(params, "before")
+    }
+    const doLogAfter = (params: any[], result: any) => doLog(params, "after", result)
+    let wrapper = function (...params): any {
+      doLogBefore(params)
+      let result = method.apply(instance, params);
       if (result instanceof Promise) {
         return result.then(val => {
-          doLog(val);
+          doLogAfter(params, val);
           return val;
         }).catch(reason => {
-          doLog(reason);
+          doLogAfter(params, reason);
           return Promise.reject(reason);
         });
       }
 
-      doLog(result);
+      doLogAfter(params, result);
       return result;
     }
     return wrapper.apply(this, rest);
