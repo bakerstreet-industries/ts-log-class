@@ -16,7 +16,7 @@
 
 ## Usage
 
-```
+```ts
 import log from "ts-log-class";
 
 @log()
@@ -33,7 +33,30 @@ export class Car {
 }
 ```
 
+You can also implement IHasTsLogClassLogger you ts-log-class will use imeplemnted logger.
+
+```ts
+import log, { IHasTsLogClassLogger } from "ts-log-class";
+
+@log()
+export class Car implements IHasTsLogClassLogger {
+  numWheels: number = 4;
+  tsLogClassLogger = console.log
+  // Will use tsLogClassLogger for logging
+
+  drive(mph: number): Promise<string> {
+    return new Promise(resolve => {
+      setTimeout(() => {
+        resolve(`Driving ${mph.toString()}mph!`);
+      }, 100);
+    });
+  }
+}
+```
+
+
 See [main.spec.ts](https://github.com/bakerstreet-industries/ts-log-class/blob/master/tests/main.spec.ts) for additional usage examples.
+
 
 ## Output
 
@@ -43,12 +66,12 @@ new Car().drive(32);
 
 `console.log` output:
 ```
-{"className":"Car","methodName":"drive","timestamp":1513536484430,"arguments":{"mph": 32},"properties":{"numWheels": 4},"result":"Driving 32mph!"}
+{"when":"after","className":"Car","methodName":"drive","timestamp":1513536484430,"arguments":{"mph": 32},"properties":{"numWheels": 4},"result":"Driving 32mph!"}
 ```
 
 ## Options
 
-The decorator, `@log()` takes in a configuration object `ILogOptions` with `hook` and `out` properties.
+The decorator, `@log()` takes in a configuration object `ILogOptions` with `hook`, `out`, `strategy` properties.
 
 ### Hook
 
@@ -63,3 +86,7 @@ The hook property is a function implementing the `IHookProperties` interface. Yo
 ### Out
 
 By default, `console.log`, but any function implementing the `console.log` interface will do: `(message?: any, ...optionalParams: any[]) => void`
+
+### Strategy
+
+By default, it logs after function execution (strategy = `after`), You can set it to `before-after` to make it log twice: before and after function execution.
