@@ -60,6 +60,22 @@ class MockLogImplements implements IHasTsLogClassLogger {
   }
 }
 
+@log({ hook: samplePropertyHook })
+abstract class MockLogImplementsParent implements IHasTsLogClassLogger {
+  abstract tsLogClassLogger
+  coolStuffParent(): string {
+    return "TEST1";
+  }
+}
+
+@log({ hook: samplePropertyHook })
+class MockLogImplementsChild extends MockLogImplementsParent {
+  tsLogClassLogger = console.warn
+  coolStuff(): string {
+    return "TEST2";
+  }
+}
+
 
 describe("ts-log-class", () => {
   let sandbox: ChaiSpies.Sandbox
@@ -121,6 +137,25 @@ describe("ts-log-class", () => {
     chai.expect(spyLogger).to.have.been.called.once;
     chai.expect(messages.length).to.be.equal(1);
     chai.expect(messages[0]).to.equal('{"when":"after","className":"MockLogImplements","methodName":"coolStuff","timestamp":0,"arguments":{},"properties":{},"result":"TEST"}');
+  });
+
+  it("Implemented logger works with inheritance", () => {
+    const spyOut = sandbox.on(console, 'log');
+    const mc = new MockLogImplementsChild();
+    const spyLogger = sandbox.on(mc, 'tsLogClassLogger')
+    mc.coolStuffParent();
+
+    chai.expect(spyOut).to.have.not.been.called();
+    chai.expect(spyLogger).to.have.been.called.once;
+    chai.expect(messages.length).to.be.equal(1);
+    chai.expect(messages[0]).to.equal('{"when":"after","className":"MockLogImplementsChild","methodName":"coolStuffParent","timestamp":0,"arguments":{},"properties":{},"result":"TEST1"}');
+
+    mc.coolStuff();
+
+    chai.expect(spyOut).to.have.not.been.called();
+    chai.expect(spyLogger).to.have.been.called.twice;
+    chai.expect(messages.length).to.be.equal(2);
+    chai.expect(messages[1]).to.equal('{"when":"after","className":"MockLogImplementsChild","methodName":"coolStuff","timestamp":0,"arguments":{},"properties":{},"result":"TEST2"}');
   });
 
   it("Should log output to console.error", () => {

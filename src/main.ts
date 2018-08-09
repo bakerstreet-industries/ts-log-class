@@ -93,7 +93,7 @@ function applyMonkeyPatch(target, prototype, method: IPatchedMethod, methodName:
       out(
         opts.hook({
           when,
-          className: prototype.constructor.name,
+          className: instance.constructor.name,
           methodName,
           timestamp: Date.now(),
           arguments: buildParameterHash(params, method),

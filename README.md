@@ -33,7 +33,7 @@ export class Car {
 }
 ```
 
-You can also implement IHasTsLogClassLogger you ts-log-class will use imeplemnted logger.
+You can also implement IHasTsLogClassLogger you ts-log-class will use imeplemnted logger. Could be useful if you want want to log parent classes, but the logger will be defined in child classes.
 
 ```ts
 import log, { IHasTsLogClassLogger } from "ts-log-class";
