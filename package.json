@@ -1,14 +1,14 @@
 {
   "name": "ts-log-class",
-  "version": "1.0.19",
+  "version": "1.1.0",
   "description": "Class Logging via Decorator with out and message format hooks",
-  "main": ".webpack/tslogclass.js",
+  "main": ".webpack/index.js",
+  "types": ".webpack/index.d.ts",
   "scripts": {
     "test": "nyc mocha **/*.spec.ts",
     "bundle": "webpack",
-    "publish-please": "publish-please",
-    "doPublish": "npm test && npm run bundle",
-    "prepublish": "publish-please guard"
+    "postbundle": "tsc -p tsconfig.json --emitDeclarationOnly --declaration --outFile ./.webpack/@types/index.d.ts --skipLibCheck",
+    "prepare": "npm test && npm run bundle"
   },
   "repository": {
     "type": "git",
@@ -27,21 +27,21 @@
   },
   "homepage": "https://github.com/bakerstreet-industries/ts-log-class#readme",
   "devDependencies": {
-    "@types/chai": "^4.0.6",
-    "@types/chai-spies": "0.0.0",
-    "@types/mocha": "^2.2.44",
-    "chai": "^4.1.2",
+    "@types/chai": "^4.2.18",
+    "@types/chai-spies": "^1.0.3",
+    "@types/mocha": "^8.2.2",
+    "chai": "^4.3.4",
     "chai-spies-next": "^0.9.3",
-    "coveralls": "^3.0.0",
-    "mocha": "^4.0.1",
+    "coveralls": "^3.1.0",
+    "mocha": "^8.4.0",
     "mocha-lcov-reporter": "^1.3.0",
-    "nyc": "^11.3.0",
-    "publish-please": "^2.3.1",
-    "ts-loader": "^3.2.0",
-    "ts-node": "^3.3.0",
-    "tslint": "^5.8.0",
-    "typescript": "^2.6.2",
-    "webpack": "^3.9.1"
+    "nyc": "^15.1.0",
+    "ts-loader": "^9.2.2",
+    "ts-node": "^10.0.0",
+    "tslint": "^6.1.3",
+    "typescript": "^4.3.2",
+    "webpack": "^5.37.1",
+    "webpack-cli": "^4.7.0"
   },
   "nyc": {
     "include": [
@@ -61,7 +61,7 @@
     "instrument": true
   },
   "dependencies": {
-    "circular-json": "^0.5.1"
+    "circular-json": "^0.5.9"
   },
-  "typings": ".webpack/src/main.d.ts"
+  "typings": ".webpack/@types/index.d.ts"
 }

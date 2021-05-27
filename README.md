@@ -33,7 +33,7 @@ export class Car {
 }
 ```
 
-See [main.spec.ts](https://github.com/bakerstreet-industries/ts-log-class/blob/master/tests/main.spec.ts) for additional usage examples.
+See [tslogclass.spec.ts](https://github.com/bakerstreet-industries/ts-log-class/blob/master/tests/tslogclass.spec.ts) for additional usage examples.
 
 ## Output
 

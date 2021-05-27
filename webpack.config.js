@@ -1,26 +1,25 @@
 const path = require('path');
 
 module.exports = {
-  entry: './src/main.ts',
-  resolve: {
-    extensions: [
-      '.js',
-      '.jsx',
-      '.json',
-      '.ts',
-      '.tsx'
-    ]
-  },
+  entry: './src/tslogclass.ts',
+  mode: 'production',
   output: {
     libraryTarget: 'umd',
     library: 'ts-log-class',
     path: path.join(__dirname, '.webpack'),
-    filename: 'tslogclass.js',
+    filename: 'index.js',
   },
   target: 'node',
   module: {
-    loaders: [
-      { test: /\.ts(x?)$/, loader: 'ts-loader' },
+    rules: [
+      {
+        test: /\.ts(x?)$/,
+        exclude: /\.test\.ts(x)?/,
+        include: /src/,
+        use: [
+          { loader: 'ts-loader'}
+        ]
+      },
     ],
   },
 };
