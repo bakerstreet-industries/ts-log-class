@@ -5,7 +5,6 @@
     "target": "es5",
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
-    "declaration": true,
     "lib": ["es6", "dom", "esnext.asynciterable"],
     "sourceMap": true
   }
