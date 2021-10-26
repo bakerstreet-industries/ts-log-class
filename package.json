@@ -1,9 +1,9 @@
 {
   "name": "ts-log-class",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "Class Logging via Decorator with out and message format hooks",
   "main": ".webpack/index.js",
-  "types": ".webpack/index.d.ts",
+  "types": ".webpack/@types/index.d.ts",
   "scripts": {
     "test": "nyc mocha **/*.spec.ts",
     "bundle": "webpack",
