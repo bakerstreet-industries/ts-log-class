@@ -1,7 +1,7 @@
 const path = require('path');
 
 module.exports = {
-  entry: './src/tslogclass.ts',
+  entry: './src/ts-log-class.ts',
   mode: 'production',
   output: {
     libraryTarget: 'umd',

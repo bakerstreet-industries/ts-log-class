@@ -1,7 +1,7 @@
 import * as chai from "chai";
 import * as spies from "chai-spies-next";
-import log, { setDefault } from "../src/tslogclass";
-import { IHookProperties, ILogOptions } from "./../src/tslogclass";
+import log, { setDefault } from "../src/ts-log-class";
+import { IHookProperties, ILogOptions } from "../src/ts-log-class";
 
 chai.use(spies);
 
